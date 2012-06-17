@@ -1,14 +1,22 @@
 package uk.co.jacekk.bukkit.playerstats.data;
 
 import org.bukkit.Material;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
+import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.entity.EntityDamageEvent;
+import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.player.PlayerBucketEmptyEvent;
 import org.bukkit.event.player.PlayerBucketFillEvent;
 import org.bukkit.event.player.PlayerChatEvent;
 import org.bukkit.event.player.PlayerCommandPreprocessEvent;
+import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
 
 import uk.co.jacekk.bukkit.baseplugin.BaseListener;
 import uk.co.jacekk.bukkit.playerstats.PlayerStats;
@@ -17,6 +25,18 @@ public class PlayerDataListener extends BaseListener<PlayerStats> {
 	
 	public PlayerDataListener(PlayerStats plugin){
 		super(plugin);
+	}
+	
+	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+	public void onPlayerJoin(PlayerJoinEvent event){
+		plugin.playerDataManager.registerPlayer(event.getPlayer().getName());
+	}
+	
+	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+	public void onPlayerQuit(PlayerQuitEvent event){
+		plugin.playerDataManager.unregisterPlayer(event.getPlayer().getName());
+		
+		// TODO: Push remaining changes onto queue.
 	}
 	
 	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
@@ -33,20 +53,17 @@ public class PlayerDataListener extends BaseListener<PlayerStats> {
 	
 	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
 	public void onBlockBreak(BlockBreakEvent event){
-		PlayerData data = plugin.playerDataManager.getDataFor(event.getPlayer().getName());
-		data.addBlockBreak(event.getBlock().getType());
+		plugin.playerDataManager.getDataFor(event.getPlayer().getName()).addBlockBreak(event.getBlock().getType());
 	}
 	
 	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
 	public void onBucketFill(PlayerBucketFillEvent event){
-		PlayerData data = plugin.playerDataManager.getDataFor(event.getPlayer().getName());
-		data.addBlockBreak(event.getBlockClicked().getRelative(event.getBlockFace()).getType());
+		plugin.playerDataManager.getDataFor(event.getPlayer().getName()).addBlockBreak(event.getBlockClicked().getRelative(event.getBlockFace()).getType());
 	}
 	
 	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
 	public void onBlockPlace(BlockPlaceEvent event){
-		PlayerData data = plugin.playerDataManager.getDataFor(event.getPlayer().getName());
-		data.addBlockPlace(event.getBlock().getType());
+		plugin.playerDataManager.getDataFor(event.getPlayer().getName()).addBlockPlace(event.getBlock().getType());
 	}
 	
 	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
@@ -56,6 +73,42 @@ public class PlayerDataListener extends BaseListener<PlayerStats> {
 		Material bucketType = event.getPlayer().getItemInHand().getType();
 		
 		data.addBlockPlace((bucketType == Material.WATER_BUCKET) ? Material.WATER : Material.LAVA);
+	}
+	
+	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+	public void onEntityDeath(EntityDeathEvent event){
+		LivingEntity entity = event.getEntity();
+		EntityDamageEvent damageEvent = entity.getLastDamageCause();
+		
+		if (damageEvent instanceof EntityDamageByEntityEvent){
+			EntityDamageByEntityEvent entityDamageEvent = (EntityDamageByEntityEvent) damageEvent;
+			
+			Entity killer = entityDamageEvent.getDamager();
+			
+			if (killer instanceof LivingEntity){
+				if (killer instanceof Player){
+					String killerName = ((Player) killer).getName();
+					
+					if (entity instanceof Player){
+						// player killed player
+						String deadPlayerName = ((Player) entity).getName();
+						
+						plugin.playerDataManager.getDataFor(deadPlayerName).addPlayerDeath(killerName);
+						plugin.playerDataManager.getDataFor(killerName).addPlayerKill(deadPlayerName);
+					}else{
+						// player killed mob
+						plugin.playerDataManager.getDataFor(killerName).addMobKill(entity.getType());
+					}
+				}else{
+					if (entity instanceof Player){
+						// player killed mob
+						String deadPlayerName = ((Player) entity).getName();
+						
+						plugin.playerDataManager.getDataFor(deadPlayerName).addMobDeath(killer.getType());
+					}
+				}
+			}
+		}
 	}
 	
 }
