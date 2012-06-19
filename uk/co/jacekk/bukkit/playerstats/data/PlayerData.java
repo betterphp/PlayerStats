@@ -52,10 +52,7 @@ public class PlayerData {
 	}
 	
 	public boolean writeNeeded(){
-		return (	this.totalChatMessages > 0 ||
-					this.totalCommands > 0 ||
-					this.blocksBroken.size() > 0 ||
-					this.blocksPlaced.size() > 0 ||
+		return (
 					this.mobsKilled.size() > 0 ||
 					this.playersKilled.size() > 0 ||
 					this.mobDeaths.size() > 0 || 
