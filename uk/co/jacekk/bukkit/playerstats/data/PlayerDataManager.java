@@ -26,4 +26,8 @@ public class PlayerDataManager {
 		return this.data.get(playerName);
 	}
 	
+	public HashMap<String, PlayerData> getAll(){
+		return this.data;
+	}
+	
 }

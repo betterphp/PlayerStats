@@ -34,9 +34,9 @@ public class PlayerDataListener extends BaseListener<PlayerStats> {
 	
 	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
 	public void onPlayerQuit(PlayerQuitEvent event){
-		plugin.playerDataManager.unregisterPlayer(event.getPlayer().getName());
-		
 		// TODO: Push remaining changes onto queue.
+		
+		plugin.playerDataManager.unregisterPlayer(event.getPlayer().getName());
 	}
 	
 	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)

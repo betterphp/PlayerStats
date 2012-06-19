@@ -23,7 +23,19 @@ public class PlayerData {
 	public HashMap<EntityType, Integer> mobDeaths;
 	public HashMap<String, Integer> playerDeaths;
 	
+	// the time the player last joined
+	public long lastJoinTime;
+	
+	// the the the data was last pushed to the database.
+	public long lastUpdate;
+	
 	public PlayerData(){
+		this.reset();
+		
+		this.lastJoinTime = System.currentTimeMillis() / 1000;
+	}
+	
+	public void reset(){
 		this.totalChatMessages = 0;
 		this.totalCommands = 0;
 		
@@ -35,6 +47,20 @@ public class PlayerData {
 		
 		this.mobDeaths = new HashMap<EntityType, Integer>();
 		this.playerDeaths = new HashMap<String, Integer>();
+		
+		this.lastUpdate = System.currentTimeMillis() / 1000;
+	}
+	
+	public boolean writeNeeded(){
+		return (	this.totalChatMessages > 0 ||
+					this.totalCommands > 0 ||
+					this.blocksBroken.size() > 0 ||
+					this.blocksPlaced.size() > 0 ||
+					this.mobsKilled.size() > 0 ||
+					this.playersKilled.size() > 0 ||
+					this.mobDeaths.size() > 0 || 
+					this.playerDeaths.size() > 0
+				);
 	}
 	
 	public void addBlockBreak(Material type){
