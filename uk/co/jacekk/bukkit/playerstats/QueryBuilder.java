@@ -43,8 +43,6 @@ public class QueryBuilder {
 		sql.append("`player_total_commands` = `player_total_commands` + VALUES(`player_total_commands`),");
 		sql.append("`player_total_chat` = `player_total_chat` + VALUES(`player_total_chat`)");
 		
-		System.out.println(sql.toString());
-		
 		return sql.toString();
 	}
 	
@@ -88,7 +86,7 @@ public class QueryBuilder {
 			String playerName = entry.getKey();
 			PlayerData data = entry.getValue();
 			
-			for (Entry<Material, Integer> blocks : data.blocksPlaced.entrySet()){
+			for (Entry<Material, Integer> blocks : data.blocksBroken.entrySet()){
 				sql.append("(");
 				sql.append("(SELECT `player_id` FROM `stats_players` WHERE `player_name` = '");
 				sql.append(playerName);
