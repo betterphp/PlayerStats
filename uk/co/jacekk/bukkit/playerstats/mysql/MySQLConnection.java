@@ -30,13 +30,17 @@ public class MySQLConnection extends Thread implements Runnable {
 	}
 	
 	public void run(){
+		String sql = "";
+		
 		while (true){
 			try{
 				if (this.connection.isClosed()){
 					this.connection = DriverManager.getConnection(this.url, this.user, this.pass);
 				}
 				
-				this.connection.createStatement().execute(this.queryQueue.take());
+				sql = this.queryQueue.take();
+				
+				this.connection.createStatement().execute(sql);
 			}catch (InterruptedException e){
 				try{
 					this.connection.close();
@@ -46,7 +50,8 @@ public class MySQLConnection extends Thread implements Runnable {
 				
 				return;
 			}catch (SQLException e){
-				e.printStackTrace();
+				System.err.println("SQL Error: " + e.getMessage());
+				System.err.println("In Query: " + sql);
 			}
 		}
 	}

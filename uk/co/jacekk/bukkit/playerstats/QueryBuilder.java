@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.Map.Entry;
 
 import org.bukkit.Material;
+import org.bukkit.entity.EntityType;
 
 import uk.co.jacekk.bukkit.playerstats.data.PlayerData;
 
@@ -94,6 +95,66 @@ public class QueryBuilder {
 				sql.append(blocks.getKey().getId());
 				sql.append(", ");
 				sql.append(blocks.getValue());
+				sql.append("), ");
+			}
+		}
+		
+		sql.replace(sql.length() - 2, sql.length(), " ");
+		
+		sql.append("ON DUPLICATE KEY UPDATE ");
+		sql.append("`total` = `total` + VALUES(`total`)");
+		
+		return sql.toString();
+	}
+	
+	public static String updateMobKills(HashMap<String, PlayerData> players){
+		StringBuilder sql = new StringBuilder();
+		
+		sql.append("INSERT INTO `stats_mob_kills` (`player_id`, `mob_name`, `total`) ");
+		sql.append("VALUES ");
+		
+		for (Entry<String, PlayerData> entry : players.entrySet()){
+			String playerName = entry.getKey();
+			PlayerData data = entry.getValue();
+			
+			for (Entry<EntityType, Integer> mobs : data.mobsKilled.entrySet()){
+				sql.append("(");
+				sql.append("(SELECT `player_id` FROM `stats_players` WHERE `player_name` = '");
+				sql.append(playerName);
+				sql.append("'), ");
+				sql.append(mobs.getKey().name());
+				sql.append(", ");
+				sql.append(mobs.getValue());
+				sql.append("), ");
+			}
+		}
+		
+		sql.replace(sql.length() - 2, sql.length(), " ");
+		
+		sql.append("ON DUPLICATE KEY UPDATE ");
+		sql.append("`total` = `total` + VALUES(`total`)");
+		
+		return sql.toString();
+	}
+	
+	public static String updateMobDeaths(HashMap<String, PlayerData> players){
+		StringBuilder sql = new StringBuilder();
+		
+		sql.append("INSERT INTO `stats_mob_deaths` (`player_id`, `mob_name`, `total`) ");
+		sql.append("VALUES ");
+		
+		for (Entry<String, PlayerData> entry : players.entrySet()){
+			String playerName = entry.getKey();
+			PlayerData data = entry.getValue();
+			
+			for (Entry<EntityType, Integer> mobs : data.mobDeaths.entrySet()){
+				sql.append("(");
+				sql.append("(SELECT `player_id` FROM `stats_players` WHERE `player_name` = '");
+				sql.append(playerName);
+				sql.append("'), ");
+				sql.append(mobs.getKey().name());
+				sql.append(", ");
+				sql.append(mobs.getValue());
 				sql.append("), ");
 			}
 		}

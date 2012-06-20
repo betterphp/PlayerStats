@@ -53,7 +53,6 @@ public class PlayerData {
 	
 	public boolean writeNeeded(){
 		return (
-					this.mobsKilled.size() > 0 ||
 					this.playersKilled.size() > 0 ||
 					this.mobDeaths.size() > 0 || 
 					this.playerDeaths.size() > 0
