@@ -30,7 +30,7 @@ public class DatabaseUpdateTask extends BaseTask<PlayerStats> {
 			String playerName = entry.getKey();
 			PlayerData data = entry.getValue();
 			
-			if (data.totalChatMessages > 0 || data.totalCommands > 0){
+			if (data.totalChatMessages > 0 || data.totalCommands > 0 || data.lastJoinTime == data.lastUpdate){
 				updatePlayers.put(playerName, data);
 			}
 			

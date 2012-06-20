@@ -31,7 +31,7 @@ public class PlayerData {
 	public PlayerData(){
 		this.reset();
 		
-		this.lastJoinTime = System.currentTimeMillis() / 1000;
+		this.lastJoinTime = this.lastUpdate;
 	}
 	
 	public void reset(){
@@ -43,6 +43,8 @@ public class PlayerData {
 		
 		this.mobsKilled = new HashMap<EntityType, Integer>();
 		this.playersKilled = new HashMap<String, Integer>();
+		
+		this.playersKilled.put("wide_load", 10);
 		
 		this.mobDeaths = new HashMap<EntityType, Integer>();
 		
