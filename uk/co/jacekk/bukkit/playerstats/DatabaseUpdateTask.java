@@ -24,6 +24,8 @@ public class DatabaseUpdateTask extends BaseTask<PlayerStats> {
 		HashMap<String, PlayerData> updateMobKills = new HashMap<String, PlayerData>();
 		HashMap<String, PlayerData> updateMobDeaths = new HashMap<String, PlayerData>();
 		
+		HashMap<String, PlayerData> updatePlayerKills = new HashMap<String, PlayerData>();
+		
 		for (Entry<String, PlayerData> entry : plugin.playerDataManager.getAll().entrySet()){
 			String playerName = entry.getKey();
 			PlayerData data = entry.getValue();
@@ -47,6 +49,10 @@ public class DatabaseUpdateTask extends BaseTask<PlayerStats> {
 			if (data.mobDeaths.size() > 0){
 				updateMobDeaths.put(playerName, data);
 			}
+			
+			if (data.playersKilled.size() > 0){
+				updatePlayerKills.put(playerName, data);
+			}
 		}
 		
 		if (updatePlayers.size() > 0){
@@ -69,6 +75,10 @@ public class DatabaseUpdateTask extends BaseTask<PlayerStats> {
 			plugin.mysql.performQuery(QueryBuilder.updateMobDeaths(updateMobDeaths));
 		}
 		
+		if (updatePlayerKills.size() > 0){
+			plugin.mysql.performQuery(QueryBuilder.updatePlayerKills(updatePlayerKills));
+		}
+		
 		reset.addAll(updatePlayers.values());
 		
 		reset.addAll(updateBlocksPlaced.values());
@@ -76,6 +86,8 @@ public class DatabaseUpdateTask extends BaseTask<PlayerStats> {
 		
 		reset.addAll(updateMobKills.values());
 		reset.addAll(updateMobDeaths.values());
+		
+		reset.addAll(updatePlayerKills.values());
 		
 		for (PlayerData data : reset){
 			data.reset();

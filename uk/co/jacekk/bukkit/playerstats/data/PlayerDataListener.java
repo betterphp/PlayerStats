@@ -91,10 +91,7 @@ public class PlayerDataListener extends BaseListener<PlayerStats> {
 					
 					if (entity instanceof Player){
 						// player killed player
-						String deadPlayerName = ((Player) entity).getName();
-						
-						plugin.playerDataManager.getDataFor(deadPlayerName).addPlayerDeath(killerName);
-						plugin.playerDataManager.getDataFor(killerName).addPlayerKill(deadPlayerName);
+						plugin.playerDataManager.getDataFor(killerName).addPlayerKill(((Player) entity).getName());
 					}else{
 						// player killed mob
 						plugin.playerDataManager.getDataFor(killerName).addMobKill(entity.getType());
@@ -102,9 +99,7 @@ public class PlayerDataListener extends BaseListener<PlayerStats> {
 				}else{
 					if (entity instanceof Player){
 						// player killed mob
-						String deadPlayerName = ((Player) entity).getName();
-						
-						plugin.playerDataManager.getDataFor(deadPlayerName).addMobDeath(killer.getType());
+						plugin.playerDataManager.getDataFor(((Player) entity).getName()).addMobDeath(killer.getType());
 					}
 				}
 			}

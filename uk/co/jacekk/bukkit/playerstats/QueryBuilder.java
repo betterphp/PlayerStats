@@ -167,4 +167,34 @@ public class QueryBuilder {
 		return sql.toString();
 	}
 	
+	public static String updatePlayerKills(HashMap<String, PlayerData> players){
+		StringBuilder sql = new StringBuilder();
+		
+		sql.append("INSERT INTO `stats_player_kills` (`player_id`, `killed_player_id`, `total`) ");
+		sql.append("VALUES ");
+		
+		for (Entry<String, PlayerData> entry : players.entrySet()){
+			String playerName = entry.getKey();
+			PlayerData data = entry.getValue();
+			
+			for (Entry<String, Integer> player : data.playersKilled.entrySet()){
+				sql.append("(");
+				sql.append("(SELECT `player_id` FROM `stats_players` WHERE `player_name` = '");
+				sql.append(playerName);
+				sql.append("'), (SELECT `player_id` FROM `stats_players` WHERE `player_name` = '");
+				sql.append(player.getKey());
+				sql.append("'), ");
+				sql.append(player.getValue());
+				sql.append("), ");
+			}
+		}
+		
+		sql.replace(sql.length() - 2, sql.length(), " ");
+		
+		sql.append("ON DUPLICATE KEY UPDATE ");
+		sql.append("`total` = `total` + VALUES(`total`)");
+		
+		return sql.toString();
+	}
+	
 }

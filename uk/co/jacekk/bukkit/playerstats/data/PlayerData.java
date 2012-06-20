@@ -21,7 +21,6 @@ public class PlayerData {
 	
 	// how many times a player has been killed
 	public HashMap<EntityType, Integer> mobDeaths;
-	public HashMap<String, Integer> playerDeaths;
 	
 	// the time the player last joined
 	public long lastJoinTime;
@@ -46,17 +45,8 @@ public class PlayerData {
 		this.playersKilled = new HashMap<String, Integer>();
 		
 		this.mobDeaths = new HashMap<EntityType, Integer>();
-		this.playerDeaths = new HashMap<String, Integer>();
 		
 		this.lastUpdate = System.currentTimeMillis() / 1000;
-	}
-	
-	public boolean writeNeeded(){
-		return (
-					this.playersKilled.size() > 0 ||
-					this.mobDeaths.size() > 0 || 
-					this.playerDeaths.size() > 0
-				);
 	}
 	
 	public void addBlockBreak(Material type){
@@ -77,10 +67,6 @@ public class PlayerData {
 	
 	public void addPlayerKill(String name){
 		this.playersKilled.put(name, (this.playersKilled.containsKey(name)) ? this.playersKilled.get(name) + 1 : 1);
-	}
-	
-	public void addPlayerDeath(String name){
-		this.playerDeaths.put(name, (this.playerDeaths.containsKey(name)) ? this.playerDeaths.get(name) + 1 : 1);
 	}
 	
 }
