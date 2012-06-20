@@ -26,7 +26,7 @@ public class MySQLConnection extends Thread implements Runnable {
 			e.printStackTrace();
 		}
 		
-		this.queryQueue = new LinkedBlockingQueue<String>();
+		this.queryQueue = new LinkedBlockingQueue<String>(16);
 	}
 	
 	public void run(){
@@ -51,7 +51,7 @@ public class MySQLConnection extends Thread implements Runnable {
 				return;
 			}catch (SQLException e){
 				System.err.println("SQL Error: " + e.getMessage());
-				System.err.println("In Query: " + sql);
+				System.err.println("Query: " + sql);
 			}
 		}
 	}
@@ -61,7 +61,7 @@ public class MySQLConnection extends Thread implements Runnable {
 	}
 	
 	public void waitUntilDone(){
-		while (this.queryQueue.size() > 0){
+		while (!this.queryQueue.isEmpty()){
 			try{
 				Thread.sleep(100);
 			}catch (InterruptedException e){ }

@@ -44,8 +44,6 @@ public class PlayerData {
 		this.mobsKilled = new HashMap<EntityType, Integer>();
 		this.playersKilled = new HashMap<String, Integer>();
 		
-		this.playersKilled.put("wide_load", 10);
-		
 		this.mobDeaths = new HashMap<EntityType, Integer>();
 		
 		this.lastUpdate = System.currentTimeMillis() / 1000;
