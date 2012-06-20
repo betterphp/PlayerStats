@@ -121,9 +121,9 @@ public class QueryBuilder {
 				sql.append("(");
 				sql.append("(SELECT `player_id` FROM `stats_players` WHERE `player_name` = '");
 				sql.append(playerName);
-				sql.append("'), ");
+				sql.append("'), '");
 				sql.append(mobs.getKey().name());
-				sql.append(", ");
+				sql.append("', ");
 				sql.append(mobs.getValue());
 				sql.append("), ");
 			}
@@ -151,9 +151,9 @@ public class QueryBuilder {
 				sql.append("(");
 				sql.append("(SELECT `player_id` FROM `stats_players` WHERE `player_name` = '");
 				sql.append(playerName);
-				sql.append("'), ");
+				sql.append("'), '");
 				sql.append(mobs.getKey().name());
-				sql.append(", ");
+				sql.append("', ");
 				sql.append(mobs.getValue());
 				sql.append("), ");
 			}
