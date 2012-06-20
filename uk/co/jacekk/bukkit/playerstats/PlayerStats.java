@@ -26,7 +26,7 @@ public class PlayerStats extends BasePlugin {
 		
 		this.pluginManager.registerEvents(new PlayerDataListener(this), this);
 		
-		this.scheduler.scheduleSyncRepeatingTask(this, new TestTask(this), 40, 40); // 2 seconds
+	//	this.scheduler.scheduleSyncRepeatingTask(this, new TestTask(this), 40, 40); // 2 seconds
 		this.scheduler.scheduleSyncRepeatingTask(this, new DatabaseUpdateTask(this), 600, 600); // 30 seconds
 	}
 	
