@@ -38,7 +38,6 @@ public class QueryBuilder {
 		sql.replace(sql.length() - 2, sql.length(), " ");
 		
 		sql.append("ON DUPLICATE KEY UPDATE ");
-		sql.append("`player_name` = VALUES(`player_name`), ");
 		sql.append("`player_last_join` = VALUES(`player_last_join`), ");
 		sql.append("`player_time_online` = `player_time_online` + VALUES(`player_time_online`),");
 		sql.append("`player_total_commands` = `player_total_commands` + VALUES(`player_total_commands`),");

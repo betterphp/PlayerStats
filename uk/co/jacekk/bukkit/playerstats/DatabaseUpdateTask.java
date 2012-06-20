@@ -1,7 +1,6 @@
 package uk.co.jacekk.bukkit.playerstats;
 
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map.Entry;
 
 import uk.co.jacekk.bukkit.baseplugin.BaseTask;
@@ -14,7 +13,7 @@ public class DatabaseUpdateTask extends BaseTask<PlayerStats> {
 	}
 	
 	public void run(){
-		HashSet<PlayerData> reset = new HashSet<PlayerData>();
+		HashMap<String, PlayerData> reset = new HashMap<String, PlayerData>();
 		
 		HashMap<String, PlayerData> updatePlayers = new HashMap<String, PlayerData>();
 		
@@ -79,18 +78,25 @@ public class DatabaseUpdateTask extends BaseTask<PlayerStats> {
 			plugin.mysql.performQuery(QueryBuilder.updatePlayerKills(updatePlayerKills));
 		}
 		
-		reset.addAll(updatePlayers.values());
+		reset.putAll(updatePlayers);
 		
-		reset.addAll(updateBlocksPlaced.values());
-		reset.addAll(updateBlocksBroken.values());
+		reset.putAll(updateBlocksPlaced);
+		reset.putAll(updateBlocksBroken);
 		
-		reset.addAll(updateMobKills.values());
-		reset.addAll(updateMobDeaths.values());
+		reset.putAll(updateMobKills);
+		reset.putAll(updateMobDeaths);
 		
-		reset.addAll(updatePlayerKills.values());
+		reset.putAll(updatePlayerKills);
 		
-		for (PlayerData data : reset){
-			data.reset();
+		for (Entry<String, PlayerData> entry : reset.entrySet()){
+			String playerName = entry.getKey();
+			PlayerData data = entry.getValue();
+			
+			if (plugin.server.getPlayer(playerName) == null){
+				plugin.playerDataManager.unregisterPlayer(playerName);
+			}else{
+				data.reset();
+			}
 		}
 	}
 	

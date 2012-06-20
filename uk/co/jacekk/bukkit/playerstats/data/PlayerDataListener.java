@@ -16,7 +16,6 @@ import org.bukkit.event.player.PlayerBucketFillEvent;
 import org.bukkit.event.player.PlayerChatEvent;
 import org.bukkit.event.player.PlayerCommandPreprocessEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
-import org.bukkit.event.player.PlayerQuitEvent;
 
 import uk.co.jacekk.bukkit.baseplugin.BaseListener;
 import uk.co.jacekk.bukkit.playerstats.PlayerStats;
@@ -29,14 +28,13 @@ public class PlayerDataListener extends BaseListener<PlayerStats> {
 	
 	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
 	public void onPlayerJoin(PlayerJoinEvent event){
-		plugin.playerDataManager.registerPlayer(event.getPlayer().getName());
-	}
-	
-	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
-	public void onPlayerQuit(PlayerQuitEvent event){
-		// TODO: Push remaining changes onto queue.
+		String playerName = event.getPlayer().getName();
 		
-		plugin.playerDataManager.unregisterPlayer(event.getPlayer().getName());
+		if (!plugin.playerDataManager.gotDataFor(playerName)){
+			plugin.playerDataManager.registerPlayer(playerName);
+		}else{
+			plugin.playerDataManager.getDataFor(playerName).lastJoinTime =  System.currentTimeMillis() / 1000;
+		}
 	}
 	
 	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
