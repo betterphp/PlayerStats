@@ -14,6 +14,8 @@ public class PlayerStats extends BasePlugin {
 	
 	public PlayerDataManager playerDataManager;
 	
+	private DatabaseUpdateTask databaseUpdateTask;
+	
 	public void onEnable(){
 		super.onEnable(true);
 		
@@ -27,11 +29,15 @@ public class PlayerStats extends BasePlugin {
 		this.pluginManager.registerEvents(new PlayerDataListener(this), this);
 		
 	//	this.scheduler.scheduleSyncRepeatingTask(this, new TestTask(this), 40, 40); // 2 seconds
-		this.scheduler.scheduleSyncRepeatingTask(this, new DatabaseUpdateTask(this), 600, 600); // 30 seconds
+		this.databaseUpdateTask = new DatabaseUpdateTask(this);
+		this.scheduler.scheduleSyncRepeatingTask(this, this.databaseUpdateTask, 600, 600); // 30 seconds
 	}
 	
 	public void onDisable(){
+		this.databaseUpdateTask.run();
 		
+		this.mysql.waitUntilDone();
+		this.mysql.stopThread();
 	}
 	
 }

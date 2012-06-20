@@ -56,6 +56,18 @@ public class MySQLConnection extends Thread implements Runnable {
 		}
 	}
 	
+	public void stopThread(){
+		this.interrupt();
+	}
+	
+	public void waitUntilDone(){
+		while (this.queryQueue.size() > 0){
+			try{
+				Thread.sleep(100);
+			}catch (InterruptedException e){ }
+		}
+	}
+	
 	public void performQuery(String sql){
 		this.queryQueue.add(sql);
 	}
