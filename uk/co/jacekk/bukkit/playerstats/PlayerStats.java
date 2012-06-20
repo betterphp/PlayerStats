@@ -1,6 +1,9 @@
 package uk.co.jacekk.bukkit.playerstats;
 
+import java.io.File;
+
 import uk.co.jacekk.bukkit.baseplugin.BasePlugin;
+import uk.co.jacekk.bukkit.baseplugin.config.PluginConfig;
 import uk.co.jacekk.bukkit.playerstats.data.PlayerDataListener;
 import uk.co.jacekk.bukkit.playerstats.data.PlayerDataManager;
 import uk.co.jacekk.bukkit.playerstats.mysql.MySQLConnection;
@@ -14,7 +17,9 @@ public class PlayerStats extends BasePlugin {
 	public void onEnable(){
 		super.onEnable(true);
 		
-		this.mysql = new MySQLConnection("127.0.0.1", "root", "notmypassword", "minecraft_server");
+		this.config = new PluginConfig(new File(this.baseDir + File.separator + "config.yml"), Config.values(), this.log);
+		
+		this.mysql = new MySQLConnection(this.config.getString(Config.DATABASE_HOST), this.config.getString(Config.DATABASE_USER), this.config.getString(Config.DATABASE_PASS), this.config.getString(Config.DATABASE_DB_NAME));
 		this.mysql.start();
 		
 		this.playerDataManager = new PlayerDataManager();
