@@ -4,8 +4,12 @@ import java.util.HashMap;
 
 import org.bukkit.Material;
 import org.bukkit.entity.EntityType;
+import org.bukkit.entity.Player;
 
 public class PlayerData {
+	
+	// the players this data is for
+	private Player player;
 	
 	// the number of chat messages a player has sent
 	public int totalChatMessages;
@@ -28,7 +32,12 @@ public class PlayerData {
 	// the the the data was last pushed to the database.
 	public long lastUpdate;
 	
-	public PlayerData(){
+	// The direction that the player was looking when we last updated
+	public Direction lastDirection;
+	
+	public PlayerData(Player player){
+		this.player = player;
+		
 		this.reset();
 		
 		this.lastJoinTime = this.lastUpdate;
@@ -47,6 +56,12 @@ public class PlayerData {
 		this.mobDeaths = new HashMap<EntityType, Integer>();
 		
 		this.lastUpdate = System.currentTimeMillis() / 1000;
+		
+		this.lastDirection = new Direction(player.getLocation());
+	}
+	
+	public Player getPlayer(){
+		return this.player;
 	}
 	
 	public void addBlockBreak(Material type){

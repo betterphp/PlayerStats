@@ -27,7 +27,7 @@ public class QueryBuilder {
 			sql.append(", ");
 			sql.append(data.lastJoinTime);
 			sql.append(", ");
-			sql.append((System.currentTimeMillis() / 1000) - data.lastUpdate);
+			sql.append((!data.lastDirection.equals(data.getPlayer().getLocation())) ? ((System.currentTimeMillis() / 1000) - data.lastUpdate) : 0);
 			sql.append(", ");
 			sql.append(data.totalCommands);
 			sql.append(", ");

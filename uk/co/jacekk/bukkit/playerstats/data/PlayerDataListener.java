@@ -28,12 +28,12 @@ public class PlayerDataListener extends BaseListener<PlayerStats> {
 	
 	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
 	public void onPlayerJoin(PlayerJoinEvent event){
-		String playerName = event.getPlayer().getName();
+		Player player = event.getPlayer();
 		
-		if (!plugin.playerDataManager.gotDataFor(playerName)){
-			plugin.playerDataManager.registerPlayer(playerName);
+		if (!plugin.playerDataManager.gotDataFor(player)){
+			plugin.playerDataManager.registerPlayer(player);
 		}else{
-			plugin.playerDataManager.getDataFor(playerName).lastJoinTime =  System.currentTimeMillis() / 1000;
+			plugin.playerDataManager.getDataFor(player).lastJoinTime =  System.currentTimeMillis() / 1000;
 		}
 	}
 	
