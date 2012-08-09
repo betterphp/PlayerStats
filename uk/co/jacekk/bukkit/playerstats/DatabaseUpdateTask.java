@@ -55,6 +55,7 @@ public class DatabaseUpdateTask extends BaseTask<PlayerStats> {
 		}
 		
 		if (updatePlayers.size() > 0){
+			plugin.log.info("Player data updated");
 			plugin.mysql.performQuery(QueryBuilder.updatePlayers(updatePlayers));
 		}
 		
