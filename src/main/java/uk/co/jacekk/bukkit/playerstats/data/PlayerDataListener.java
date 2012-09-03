@@ -17,7 +17,7 @@ import org.bukkit.event.player.PlayerBucketFillEvent;
 import org.bukkit.event.player.PlayerCommandPreprocessEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 
-import uk.co.jacekk.bukkit.baseplugin.event.BaseListener;
+import uk.co.jacekk.bukkit.baseplugin.v1.event.BaseListener;
 import uk.co.jacekk.bukkit.playerstats.PlayerStats;
 
 public class PlayerDataListener extends BaseListener<PlayerStats> {
