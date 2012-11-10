@@ -1,28 +1,12 @@
 package uk.co.jacekk.bukkit.playerstats;
 
-import uk.co.jacekk.bukkit.baseplugin.v1.config.PluginConfigKey;
+import uk.co.jacekk.bukkit.baseplugin.v5.config.PluginConfigKey;
 
-public enum Config implements PluginConfigKey {
+public class Config {
 	
-	DATABASE_HOST(		"database.host",	"127.0.0.1"),
-	DATABASE_USER(		"database.user",	"example_user"),
-	DATABASE_PASS(		"database.pass",	"example_pass"),
-	DATABASE_DB_NAME(	"database.db-name",	"minecraft_server");
-	
-	private String key;
-	private Object defaultValue;
-	
-	private Config(String key, Object defaultValue){
-		this.key = key;
-		this.defaultValue = defaultValue;
-	}
-	
-	public String getKey(){
-		return this.key;
-	}
-	
-	public Object getDefault(){
-		return this.defaultValue;
-	}
+	public static final PluginConfigKey DATABASE_HOST		= new PluginConfigKey("database.host",		"127.0.0.1");
+	public static final PluginConfigKey DATABASE_USER		= new PluginConfigKey("database.user",		"example_user");
+	public static final PluginConfigKey DATABASE_PASS		= new PluginConfigKey("database.pass",		"example_pass");
+	public static final PluginConfigKey DATABASE_DB_NAME	= new PluginConfigKey("database.db-name",	"minecraft_server");
 	
 }
