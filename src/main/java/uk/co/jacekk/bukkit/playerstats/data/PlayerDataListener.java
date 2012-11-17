@@ -39,38 +39,66 @@ public class PlayerDataListener extends BaseListener<PlayerStats> {
 	
 	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
 	public void onPlayerChat(AsyncPlayerChatEvent event){
-		PlayerData data = plugin.playerDataManager.getDataFor(event.getPlayer().getName());
-		++data.totalChatMessages;
+		String playerName = event.getPlayer().getName();
+		
+		if (plugin.playerDataManager.gotDataFor(playerName)){
+			PlayerData data = plugin.playerDataManager.getDataFor(playerName);
+			
+			++data.totalChatMessages;
+		}
 	}
 	
 	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
 	public void onPlayerCommand(PlayerCommandPreprocessEvent event){
-		PlayerData data = plugin.playerDataManager.getDataFor(event.getPlayer().getName());
-		++data.totalCommands;
+		String playerName = event.getPlayer().getName();
+		
+		if (plugin.playerDataManager.gotDataFor(playerName)){
+			PlayerData data = plugin.playerDataManager.getDataFor(playerName);
+			++data.totalCommands;
+		}
 	}
 	
 	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
 	public void onBlockBreak(BlockBreakEvent event){
-		plugin.playerDataManager.getDataFor(event.getPlayer().getName()).addBlockBreak(event.getBlock().getType());
+		String playerName = event.getPlayer().getName();
+		
+		if (plugin.playerDataManager.gotDataFor(playerName)){
+			PlayerData data = plugin.playerDataManager.getDataFor(playerName);
+			data.addBlockBreak(event.getBlock().getType());
+		}
 	}
 	
 	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
 	public void onBucketFill(PlayerBucketFillEvent event){
-		plugin.playerDataManager.getDataFor(event.getPlayer().getName()).addBlockBreak(event.getBlockClicked().getRelative(event.getBlockFace()).getType());
+		String playerName = event.getPlayer().getName();
+		
+		if (plugin.playerDataManager.gotDataFor(playerName)){
+			PlayerData data = plugin.playerDataManager.getDataFor(playerName);
+			data.addBlockBreak(event.getBlockClicked().getRelative(event.getBlockFace()).getType());
+		}
 	}
 	
 	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
 	public void onBlockPlace(BlockPlaceEvent event){
-		plugin.playerDataManager.getDataFor(event.getPlayer().getName()).addBlockPlace(event.getBlock().getType());
+		String playerName = event.getPlayer().getName();
+		
+		if (plugin.playerDataManager.gotDataFor(playerName)){
+			PlayerData data = plugin.playerDataManager.getDataFor(playerName);
+			data.addBlockPlace(event.getBlock().getType());
+		}
 	}
 	
 	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
 	public void onBucketEmpty(PlayerBucketEmptyEvent event){
-		PlayerData data = plugin.playerDataManager.getDataFor(event.getPlayer().getName());
+		String playerName = event.getPlayer().getName();
 		
-		Material bucketType = event.getPlayer().getItemInHand().getType();
-		
-		data.addBlockPlace((bucketType == Material.WATER_BUCKET) ? Material.WATER : Material.LAVA);
+		if (plugin.playerDataManager.gotDataFor(playerName)){
+			PlayerData data = plugin.playerDataManager.getDataFor(playerName);
+			
+			Material bucketType = event.getPlayer().getItemInHand().getType();
+			
+			data.addBlockPlace((bucketType == Material.WATER_BUCKET) ? Material.WATER : Material.LAVA);
+		}
 	}
 	
 	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
@@ -87,17 +115,26 @@ public class PlayerDataListener extends BaseListener<PlayerStats> {
 				if (killer instanceof Player){
 					String killerName = ((Player) killer).getName();
 					
-					if (entity instanceof Player){
-						// player killed player
-						plugin.playerDataManager.getDataFor(killerName).addPlayerKill(((Player) entity).getName());
-					}else{
-						// player killed mob
-						plugin.playerDataManager.getDataFor(killerName).addMobKill(entity.getType());
+					if (plugin.playerDataManager.gotDataFor(killerName)){
+						PlayerData data = plugin.playerDataManager.getDataFor(killerName);
+						
+						if (entity instanceof Player){
+							// player killed player
+							data.addPlayerKill(((Player) entity).getName());
+						}else{
+							// player killed mob
+							data.addMobKill(entity.getType());
+						}
 					}
 				}else{
 					if (entity instanceof Player){
 						// player killed mob
-						plugin.playerDataManager.getDataFor(((Player) entity).getName()).addMobDeath(killer.getType());
+						String playerName = ((Player) entity).getName();
+						
+						if (plugin.playerDataManager.gotDataFor(playerName)){
+							PlayerData data = plugin.playerDataManager.getDataFor(playerName);
+							data.addMobDeath(killer.getType());
+						}
 					}
 				}
 			}
