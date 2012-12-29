@@ -1,6 +1,6 @@
 package uk.co.jacekk.bukkit.playerstats;
 
-import uk.co.jacekk.bukkit.baseplugin.v5.config.PluginConfigKey;
+import uk.co.jacekk.bukkit.baseplugin.v7.config.PluginConfigKey;
 
 public class Config {
 	

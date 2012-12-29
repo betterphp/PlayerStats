@@ -3,7 +3,7 @@ package uk.co.jacekk.bukkit.playerstats;
 import java.util.HashMap;
 import java.util.Map.Entry;
 
-import uk.co.jacekk.bukkit.baseplugin.v5.scheduler.BaseTask;
+import uk.co.jacekk.bukkit.baseplugin.v7.scheduler.BaseTask;
 import uk.co.jacekk.bukkit.playerstats.data.PlayerData;
 
 public class DatabaseUpdateTask extends BaseTask<PlayerStats> {
