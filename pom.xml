@@ -38,7 +38,7 @@
 			<groupId>org.bukkit</groupId>
 			<artifactId>bukkit</artifactId>
 			<version>1.4.6-R0.2-SNAPSHOT</version>
-			<scope>runtime</scope>
+			<scope>compile</scope>
 		</dependency>
 	</dependencies>
 	
