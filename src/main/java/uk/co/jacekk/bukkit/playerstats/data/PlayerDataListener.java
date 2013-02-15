@@ -1,5 +1,10 @@
 package uk.co.jacekk.bukkit.playerstats.data;
 
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
+import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
@@ -16,14 +21,31 @@ import org.bukkit.event.player.PlayerBucketEmptyEvent;
 import org.bukkit.event.player.PlayerBucketFillEvent;
 import org.bukkit.event.player.PlayerCommandPreprocessEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.event.player.PlayerMoveEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
 
 import uk.co.jacekk.bukkit.baseplugin.v7.event.BaseListener;
 import uk.co.jacekk.bukkit.playerstats.PlayerStats;
+import uk.co.jacekk.bukkit.playerstats.QueryBuilder;
 
 public class PlayerDataListener extends BaseListener<PlayerStats> {
 	
-	public PlayerDataListener(PlayerStats plugin){
+	private Set<String> activePlayers = Collections.synchronizedSet(new HashSet<String>());
+	
+	public PlayerDataListener(final PlayerStats plugin){
 		super(plugin);
+		Bukkit.getScheduler().scheduleSyncRepeatingTask(plugin, new Runnable(){
+			@Override
+			public void run(){
+				PlayerData data;
+				for(String player : activePlayers){
+					data = plugin.playerDataManager.getDataFor(player);
+					if(data != null)
+						data.activeTime++;
+				}
+				activePlayers.clear();
+			}
+		}, 400, 400);
 	}
 	
 	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
@@ -35,6 +57,7 @@ public class PlayerDataListener extends BaseListener<PlayerStats> {
 		}else{
 			plugin.playerDataManager.getDataFor(player).lastJoinTime =  System.currentTimeMillis() / 1000;
 		}
+		plugin.mysql.performQuery(QueryBuilder.startSession(event.getPlayer().getName()));
 	}
 	
 	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
@@ -120,7 +143,11 @@ public class PlayerDataListener extends BaseListener<PlayerStats> {
 						
 						if (entity instanceof Player){
 							// player killed player
-							data.addPlayerKill(((Player) entity).getName());
+							String deadPlayer = ((Player) entity).getName();
+							data.addPlayerKill(deadPlayer);
+							if(plugin.playerDataManager.gotDataFor(deadPlayer)){
+								plugin.playerDataManager.getDataFor(deadPlayer).addPlayerDeath(killerName);
+							}
 						}else{
 							// player killed mob
 							data.addMobKill(entity.getType());
@@ -139,6 +166,42 @@ public class PlayerDataListener extends BaseListener<PlayerStats> {
 				}
 			}
 		}
+		
+		if(!(event.getEntity() instanceof Player))
+			return;
+		
+		switch(damageEvent.getCause()){
+			case CONTACT:
+			case ENTITY_ATTACK:
+			case ENTITY_EXPLOSION:
+			case CUSTOM:
+			case PROJECTILE:
+			case WITHER:
+				break;
+			default:
+				String playername = ((Player)event.getEntity()).getName();
+				if(plugin.playerDataManager.gotDataFor(playername)){
+					plugin.playerDataManager.getDataFor(playername).addSuicideDeath(damageEvent.getCause());
+				}
+				break;
+		}
 	}
 	
+	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+	public void onMove(PlayerMoveEvent event){
+		this.activePlayers.add(event.getPlayer().getName());
+		
+		Location from = event.getFrom();
+		Location to = event.getTo();
+		
+		if(from.getBlockX() != to.getBlockX() || from.getBlockZ() != to.getBlockZ()){
+			plugin.playerDataManager.getDataFor(event.getPlayer()).distanceTravelled++;
+		}
+	}
+	
+	@EventHandler
+	public void onLeave(PlayerQuitEvent event){
+		plugin.playerDataManager.getDataFor(event.getPlayer()).logoutTime = System.currentTimeMillis() / 1000;
+		plugin.mysql.performQuery(QueryBuilder.endSession(event.getPlayer().getName(), plugin.playerDataManager.getDataFor(event.getPlayer())));
+	}
 }
