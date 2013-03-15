@@ -21,10 +21,6 @@ public class PlayerStats extends BasePlugin {
 		
 		this.config = new PluginConfig(new File(this.baseDir + File.separator + "config.yml"), Config.class, this.log);
 		this.config.reload();
-		getLogger().info(this.config.getString(Config.DATABASE_DB_NAME) + "-");
-		getLogger().info(this.config.getString(Config.DATABASE_HOST) + "-");
-		getLogger().info(this.config.getString(Config.DATABASE_USER) + "-");
-		getLogger().info(this.config.getString(Config.DATABASE_PASS) + "-");
 		
 		this.mysql = new MySQLConnection(this.config.getString(Config.DATABASE_HOST), this.config.getString(Config.DATABASE_USER), this.config.getString(Config.DATABASE_PASS), this.config.getString(Config.DATABASE_DB_NAME));
 		this.mysql.start();

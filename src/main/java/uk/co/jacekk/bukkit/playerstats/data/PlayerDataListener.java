@@ -62,38 +62,66 @@ public class PlayerDataListener extends BaseListener<PlayerStats> {
 	
 	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
 	public void onPlayerChat(AsyncPlayerChatEvent event){
-		PlayerData data = plugin.playerDataManager.getDataFor(event.getPlayer().getName());
-		data.totalChatMessages++;
+		String playerName = event.getPlayer().getName();
+
+		if (plugin.playerDataManager.gotDataFor(playerName)){
+			PlayerData data = plugin.playerDataManager.getDataFor(playerName);
+
+			++data.totalChatMessages;
+		}
 	}
 	
 	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
 	public void onPlayerCommand(PlayerCommandPreprocessEvent event){
-		PlayerData data = plugin.playerDataManager.getDataFor(event.getPlayer().getName());
-		data.totalCommands++;
+		String playerName = event.getPlayer().getName();
+
+		if (plugin.playerDataManager.gotDataFor(playerName)){
+			PlayerData data = plugin.playerDataManager.getDataFor(playerName);
+			++data.totalCommands;
+		}
 	}
 	
 	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
 	public void onBlockBreak(BlockBreakEvent event){
-		plugin.playerDataManager.getDataFor(event.getPlayer().getName()).addBlockBreak(event.getBlock().getType());
+		String playerName = event.getPlayer().getName();
+
+		if (plugin.playerDataManager.gotDataFor(playerName)){
+			PlayerData data = plugin.playerDataManager.getDataFor(playerName);
+			data.addBlockBreak(event.getBlock().getType());
+		}
 	}
 	
 	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
 	public void onBucketFill(PlayerBucketFillEvent event){
-		plugin.playerDataManager.getDataFor(event.getPlayer().getName()).addBlockBreak(event.getBlockClicked().getRelative(event.getBlockFace()).getType());
+		String playerName = event.getPlayer().getName();
+
+		if (plugin.playerDataManager.gotDataFor(playerName)){
+			PlayerData data = plugin.playerDataManager.getDataFor(playerName);
+			data.addBlockBreak(event.getBlockClicked().getRelative(event.getBlockFace()).getType());
+		}
 	}
 	
 	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
 	public void onBlockPlace(BlockPlaceEvent event){
-		plugin.playerDataManager.getDataFor(event.getPlayer().getName()).addBlockPlace(event.getBlock().getType());
+		String playerName = event.getPlayer().getName();
+
+		if (plugin.playerDataManager.gotDataFor(playerName)){
+			PlayerData data = plugin.playerDataManager.getDataFor(playerName);
+			data.addBlockPlace(event.getBlock().getType());
+		}
 	}
 	
 	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
 	public void onBucketEmpty(PlayerBucketEmptyEvent event){
-		PlayerData data = plugin.playerDataManager.getDataFor(event.getPlayer().getName());
-		
-		Material bucketType = event.getPlayer().getItemInHand().getType();
-		
-		data.addBlockPlace((bucketType == Material.WATER_BUCKET) ? Material.WATER : Material.LAVA);
+		String playerName = event.getPlayer().getName();
+
+		if (plugin.playerDataManager.gotDataFor(playerName)){
+			PlayerData data = plugin.playerDataManager.getDataFor(playerName);
+
+			Material bucketType = event.getPlayer().getItemInHand().getType();
+
+			data.addBlockPlace((bucketType == Material.WATER_BUCKET) ? Material.WATER : Material.LAVA);
+		}
 	}
 	
 	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
@@ -147,19 +175,28 @@ public class PlayerDataListener extends BaseListener<PlayerStats> {
 	
 	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
 	public void onMove(PlayerMoveEvent event){
-		this.activePlayers.add(event.getPlayer().getName());
-		
-		Location from = event.getFrom();
-		Location to = event.getTo();
-		
-		if(from.getBlockX() != to.getBlockX() || from.getBlockZ() != to.getBlockZ()){
-			plugin.playerDataManager.getDataFor(event.getPlayer()).distanceTravelled++;
+		String playerName = event.getPlayer().getName();
+
+		if (plugin.playerDataManager.gotDataFor(playerName)){
+			this.activePlayers.add(event.getPlayer().getName());
+			
+			Location from = event.getFrom();
+			Location to = event.getTo();
+			
+			if(from.getBlockX() != to.getBlockX() || from.getBlockZ() != to.getBlockZ()){
+				plugin.playerDataManager.getDataFor(event.getPlayer()).distanceTravelled++;
+			}
 		}
 	}
 	
 	@EventHandler
 	public void onLeave(PlayerQuitEvent event){
-		plugin.playerDataManager.getDataFor(event.getPlayer()).logoutTime = System.currentTimeMillis() / 1000;
-		plugin.mysql.performQuery(QueryBuilder.endSession(event.getPlayer().getName(), plugin.playerDataManager.getDataFor(event.getPlayer())));
+		String playerName = event.getPlayer().getName();
+
+		if (plugin.playerDataManager.gotDataFor(playerName)){
+			PlayerData data = plugin.playerDataManager.getDataFor(playerName);
+			data.logoutTime = System.currentTimeMillis() / 1000;
+			plugin.mysql.performQuery(QueryBuilder.endSession(event.getPlayer().getName(), data));
+		}
 	}
 }
