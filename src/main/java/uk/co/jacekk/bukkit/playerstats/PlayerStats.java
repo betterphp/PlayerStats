@@ -2,8 +2,8 @@ package uk.co.jacekk.bukkit.playerstats;
 
 import java.io.File;
 
-import uk.co.jacekk.bukkit.baseplugin.v7.BasePlugin;
-import uk.co.jacekk.bukkit.baseplugin.v7.config.PluginConfig;
+import uk.co.jacekk.bukkit.baseplugin.v9_1.BasePlugin;
+import uk.co.jacekk.bukkit.baseplugin.v9_1.config.PluginConfig;
 import uk.co.jacekk.bukkit.playerstats.data.PlayerDataListener;
 import uk.co.jacekk.bukkit.playerstats.data.PlayerDataManager;
 import uk.co.jacekk.bukkit.playerstats.mysql.MySQLConnection;
