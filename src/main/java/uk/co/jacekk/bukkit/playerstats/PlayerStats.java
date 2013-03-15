@@ -2,15 +2,15 @@ package uk.co.jacekk.bukkit.playerstats;
 
 import java.io.File;
 
-import uk.co.jacekk.bukkit.baseplugin.v7.BasePlugin;
-import uk.co.jacekk.bukkit.baseplugin.v7.config.PluginConfig;
+import uk.co.jacekk.bukkit.baseplugin.v9_1.BasePlugin;
+import uk.co.jacekk.bukkit.baseplugin.v9_1.config.PluginConfig;
 import uk.co.jacekk.bukkit.playerstats.data.PlayerDataListener;
 import uk.co.jacekk.bukkit.playerstats.data.PlayerDataManager;
 import uk.co.jacekk.bukkit.playerstats.mysql.MySQLConnection;
 
 public class PlayerStats extends BasePlugin {
 	
-	protected MySQLConnection mysql;
+	public MySQLConnection mysql;
 	
 	public PlayerDataManager playerDataManager;
 	
@@ -20,6 +20,7 @@ public class PlayerStats extends BasePlugin {
 		super.onEnable(true);
 		
 		this.config = new PluginConfig(new File(this.baseDir + File.separator + "config.yml"), Config.class, this.log);
+		this.config.reload();
 		
 		this.mysql = new MySQLConnection(this.config.getString(Config.DATABASE_HOST), this.config.getString(Config.DATABASE_USER), this.config.getString(Config.DATABASE_PASS), this.config.getString(Config.DATABASE_DB_NAME));
 		this.mysql.start();

@@ -1,5 +1,10 @@
 package uk.co.jacekk.bukkit.playerstats.data;
 
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
+import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
@@ -16,14 +21,31 @@ import org.bukkit.event.player.PlayerBucketEmptyEvent;
 import org.bukkit.event.player.PlayerBucketFillEvent;
 import org.bukkit.event.player.PlayerCommandPreprocessEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.event.player.PlayerMoveEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
 
-import uk.co.jacekk.bukkit.baseplugin.v7.event.BaseListener;
+import uk.co.jacekk.bukkit.baseplugin.v9_1.event.BaseListener;
 import uk.co.jacekk.bukkit.playerstats.PlayerStats;
+import uk.co.jacekk.bukkit.playerstats.QueryBuilder;
 
 public class PlayerDataListener extends BaseListener<PlayerStats> {
 	
-	public PlayerDataListener(PlayerStats plugin){
+	private Set<String> activePlayers = Collections.synchronizedSet(new HashSet<String>());
+	
+	public PlayerDataListener(final PlayerStats plugin){
 		super(plugin);
+		Bukkit.getScheduler().runTaskTimerAsynchronously(plugin, new Runnable(){
+			@Override
+			public void run(){
+				PlayerData data;
+				for(String player : activePlayers){
+					data = plugin.playerDataManager.getDataFor(player);
+					if(data != null)
+						data.activeTime++;
+				}
+				activePlayers.clear();
+			}
+		}, 400, 400);
 	}
 	
 	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
@@ -35,15 +57,16 @@ public class PlayerDataListener extends BaseListener<PlayerStats> {
 		}else{
 			plugin.playerDataManager.getDataFor(player).lastJoinTime =  System.currentTimeMillis() / 1000;
 		}
+		plugin.mysql.performQuery(QueryBuilder.startSession(event.getPlayer().getName()));
 	}
 	
 	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
 	public void onPlayerChat(AsyncPlayerChatEvent event){
 		String playerName = event.getPlayer().getName();
-		
+
 		if (plugin.playerDataManager.gotDataFor(playerName)){
 			PlayerData data = plugin.playerDataManager.getDataFor(playerName);
-			
+
 			++data.totalChatMessages;
 		}
 	}
@@ -51,7 +74,7 @@ public class PlayerDataListener extends BaseListener<PlayerStats> {
 	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
 	public void onPlayerCommand(PlayerCommandPreprocessEvent event){
 		String playerName = event.getPlayer().getName();
-		
+
 		if (plugin.playerDataManager.gotDataFor(playerName)){
 			PlayerData data = plugin.playerDataManager.getDataFor(playerName);
 			++data.totalCommands;
@@ -61,7 +84,7 @@ public class PlayerDataListener extends BaseListener<PlayerStats> {
 	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
 	public void onBlockBreak(BlockBreakEvent event){
 		String playerName = event.getPlayer().getName();
-		
+
 		if (plugin.playerDataManager.gotDataFor(playerName)){
 			PlayerData data = plugin.playerDataManager.getDataFor(playerName);
 			data.addBlockBreak(event.getBlock().getType());
@@ -71,7 +94,7 @@ public class PlayerDataListener extends BaseListener<PlayerStats> {
 	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
 	public void onBucketFill(PlayerBucketFillEvent event){
 		String playerName = event.getPlayer().getName();
-		
+
 		if (plugin.playerDataManager.gotDataFor(playerName)){
 			PlayerData data = plugin.playerDataManager.getDataFor(playerName);
 			data.addBlockBreak(event.getBlockClicked().getRelative(event.getBlockFace()).getType());
@@ -81,7 +104,7 @@ public class PlayerDataListener extends BaseListener<PlayerStats> {
 	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
 	public void onBlockPlace(BlockPlaceEvent event){
 		String playerName = event.getPlayer().getName();
-		
+
 		if (plugin.playerDataManager.gotDataFor(playerName)){
 			PlayerData data = plugin.playerDataManager.getDataFor(playerName);
 			data.addBlockPlace(event.getBlock().getType());
@@ -91,12 +114,12 @@ public class PlayerDataListener extends BaseListener<PlayerStats> {
 	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
 	public void onBucketEmpty(PlayerBucketEmptyEvent event){
 		String playerName = event.getPlayer().getName();
-		
+
 		if (plugin.playerDataManager.gotDataFor(playerName)){
 			PlayerData data = plugin.playerDataManager.getDataFor(playerName);
-			
+
 			Material bucketType = event.getPlayer().getItemInHand().getType();
-			
+
 			data.addBlockPlace((bucketType == Material.WATER_BUCKET) ? Material.WATER : Material.LAVA);
 		}
 	}
@@ -115,30 +138,65 @@ public class PlayerDataListener extends BaseListener<PlayerStats> {
 				if (killer instanceof Player){
 					String killerName = ((Player) killer).getName();
 					
-					if (plugin.playerDataManager.gotDataFor(killerName)){
-						PlayerData data = plugin.playerDataManager.getDataFor(killerName);
-						
-						if (entity instanceof Player){
-							// player killed player
-							data.addPlayerKill(((Player) entity).getName());
-						}else{
-							// player killed mob
-							data.addMobKill(entity.getType());
-						}
+					if (entity instanceof Player){
+						// player killed player
+						String deadPlayer = ((Player) entity).getName();
+						plugin.playerDataManager.getDataFor(killerName).addPlayerKill(deadPlayer);
+						plugin.playerDataManager.getDataFor(deadPlayer).addPlayerDeath(killerName);
+					}else{
+						// player killed mob
+						plugin.playerDataManager.getDataFor(killerName).addMobKill(entity.getType());
 					}
 				}else{
 					if (entity instanceof Player){
 						// player killed mob
-						String playerName = ((Player) entity).getName();
-						
-						if (plugin.playerDataManager.gotDataFor(playerName)){
-							PlayerData data = plugin.playerDataManager.getDataFor(playerName);
-							data.addMobDeath(killer.getType());
-						}
+						plugin.playerDataManager.getDataFor(((Player) entity).getName()).addMobDeath(killer.getType());
 					}
 				}
 			}
 		}
+		
+		if(!(event.getEntity() instanceof Player))
+			return;
+		
+		switch(damageEvent.getCause()){
+			case CONTACT:
+			case ENTITY_ATTACK:
+			case ENTITY_EXPLOSION:
+			case CUSTOM:
+			case PROJECTILE:
+			case WITHER:
+				break;
+			default:
+				plugin.playerDataManager.getDataFor(((Player)event.getEntity()).getName()).addSuicideDeath(damageEvent.getCause());
+				break;
+		}
 	}
 	
+	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+	public void onMove(PlayerMoveEvent event){
+		String playerName = event.getPlayer().getName();
+
+		if (plugin.playerDataManager.gotDataFor(playerName)){
+			this.activePlayers.add(event.getPlayer().getName());
+			
+			Location from = event.getFrom();
+			Location to = event.getTo();
+			
+			if(from.getBlockX() != to.getBlockX() || from.getBlockZ() != to.getBlockZ()){
+				plugin.playerDataManager.getDataFor(event.getPlayer()).distanceTravelled++;
+			}
+		}
+	}
+	
+	@EventHandler
+	public void onLeave(PlayerQuitEvent event){
+		String playerName = event.getPlayer().getName();
+
+		if (plugin.playerDataManager.gotDataFor(playerName)){
+			PlayerData data = plugin.playerDataManager.getDataFor(playerName);
+			data.logoutTime = System.currentTimeMillis() / 1000;
+			plugin.mysql.performQuery(QueryBuilder.endSession(event.getPlayer().getName(), data));
+		}
+	}
 }
