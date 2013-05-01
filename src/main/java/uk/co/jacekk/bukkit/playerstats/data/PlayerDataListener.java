@@ -34,17 +34,24 @@ public class PlayerDataListener extends BaseListener<PlayerStats> {
 	
 	public PlayerDataListener(final PlayerStats plugin){
 		super(plugin);
+		
 		Bukkit.getScheduler().runTaskTimerAsynchronously(plugin, new Runnable(){
+			
 			@Override
 			public void run(){
 				PlayerData data;
-				for(String player : activePlayers){
+				
+				for (String player : activePlayers){
 					data = plugin.playerDataManager.getDataFor(player);
-					if(data != null)
+					
+					if (data != null){
 						data.activeTime++;
+					}
 				}
+				
 				activePlayers.clear();
 			}
+			
 		}, 400, 400);
 	}
 	
@@ -57,6 +64,7 @@ public class PlayerDataListener extends BaseListener<PlayerStats> {
 		}else{
 			plugin.playerDataManager.getDataFor(player).lastJoinTime =  System.currentTimeMillis() / 1000;
 		}
+		
 		plugin.mysql.performQuery(QueryBuilder.startSession(event.getPlayer().getName()));
 	}
 	
@@ -66,7 +74,6 @@ public class PlayerDataListener extends BaseListener<PlayerStats> {
 
 		if (plugin.playerDataManager.gotDataFor(playerName)){
 			PlayerData data = plugin.playerDataManager.getDataFor(playerName);
-
 			++data.totalChatMessages;
 		}
 	}
@@ -156,8 +163,9 @@ public class PlayerDataListener extends BaseListener<PlayerStats> {
 			}
 		}
 		
-		if(!(event.getEntity() instanceof Player))
+		if(!(event.getEntity() instanceof Player)){
 			return;
+		}
 		
 		switch(damageEvent.getCause()){
 			case CONTACT:

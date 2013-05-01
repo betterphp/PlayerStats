@@ -113,9 +113,12 @@ public class PlayerData {
 	
 	public static int getValueSum(HashMap<?, Integer> data){
 		int all = 0;
+		
 		for(Integer value : data.values()){
 			all += value;
 		}
+		
 		return all;
 	}
+	
 }

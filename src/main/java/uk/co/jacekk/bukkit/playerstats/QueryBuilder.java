@@ -268,8 +268,10 @@ public class QueryBuilder {
 		
 		sb.append("INSERT INTO `stats_sessions` (`player_id`, `session_time`, `session_blocks_placed`, `session_blocks_broken`, `session_time_spend`, `session_time_active`, `session_distance_travelled`, `session_mob_deaths`, `session_player_deaths`, `session_suicides`) ");
 		sb.append("VALUES");
+		
 		for(Entry<String, PlayerData> entry : players.entrySet()){
 			PlayerData data = entry.getValue();
+			
 			sb.append("(");
 			sb.append("(SELECT `player_id` FROM `stats_players` WHERE `player_name` = '");
 			sb.append(entry.getKey());
@@ -293,7 +295,9 @@ public class QueryBuilder {
 			sb.append(PlayerData.getValueSum(data.suicides));
 			sb.append("), ");
 		}
+		
 		sb.replace(sb.length() - 2, sb.length(), " ");
+		
 		sb.append("ON DUPLICATE KEY UPDATE ");
 		sb.append("`session_blocks_placed` = `session_blocks_placed` + VALUES(`session_blocks_placed`), ");
 		sb.append("`session_blocks_broken` = `session_blocks_broken` + VALUES(`session_blocks_broken`), ");
@@ -335,4 +339,5 @@ public class QueryBuilder {
 		
 		return sb.toString();
 	}
+	
 }

@@ -33,7 +33,7 @@ public class DatabaseUpdateTask extends BaseTask<PlayerStats> {
 			String playerName = entry.getKey();
 			PlayerData data = entry.getValue();
 			
-			if(data.activeTime > 0 || data.distanceTravelled > 0){
+			if (data.activeTime > 0 || data.distanceTravelled > 0){
 				updateSession.put(playerName, data);
 			}
 			
@@ -64,12 +64,12 @@ public class DatabaseUpdateTask extends BaseTask<PlayerStats> {
 				updatePlayerKills.put(playerName, data);
 			}
 			
-			if(data.playerDeaths.size() > 0){
+			if (data.playerDeaths.size() > 0){
 				updatePlayerDeaths.put(playerName, data);
 				updateSession.put(playerName, data);
 			}
 			
-			if(data.suicides.size() > 0){
+			if (data.suicides.size() > 0){
 				updateSuicides.put(playerName, data);
 				updateSession.put(playerName, data);
 			}
@@ -100,15 +100,15 @@ public class DatabaseUpdateTask extends BaseTask<PlayerStats> {
 			plugin.mysql.performQuery(QueryBuilder.updatePlayerKills(updatePlayerKills));
 		}
 		
-		if(updatePlayerKills.size() > 0){
+		if (updatePlayerKills.size() > 0){
 			plugin.mysql.performQuery(QueryBuilder.updatePlayerDeaths(updatePlayerDeaths));
 		}
 		
-		if(updateSuicides.size() > 0){
+		if (updateSuicides.size() > 0){
 			plugin.mysql.performQuery(QueryBuilder.updatePlayerSuicides(updateSuicides));
 		}
 		
-		if(updateSession.size() > 0){
+		if (updateSession.size() > 0){
 			plugin.mysql.performQuery(QueryBuilder.updateSession(updateSession));
 		}
 		
@@ -129,8 +129,10 @@ public class DatabaseUpdateTask extends BaseTask<PlayerStats> {
 			PlayerData data = entry.getValue();
 			
 			if (plugin.server.getPlayer(playerName) == null){
-				if(data.logoutTime == -1)
+				if (data.logoutTime == -1){
 					data.logoutTime = System.currentTimeMillis() / 1000;
+				}
+				
 				plugin.mysql.performQuery(QueryBuilder.endSession(playerName, data));
 				plugin.playerDataManager.unregisterPlayer(playerName);
 			}else{
