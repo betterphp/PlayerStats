@@ -12,6 +12,7 @@ public class Direction {
 		this.yaw = location.getYaw();
 	}
 	
+	@Override
 	public boolean equals(Object object){
 		if (object instanceof Direction){
 			Direction direction = (Direction) object;
@@ -24,6 +25,11 @@ public class Direction {
 		}
 		
 		return false;
+	}
+	
+	@Override
+	public int hashCode(){
+		return (int) (this.pitch + (this.yaw * 1000));
 	}
 	
 }

@@ -24,7 +24,7 @@ import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 
-import uk.co.jacekk.bukkit.baseplugin.v9_1.event.BaseListener;
+import uk.co.jacekk.bukkit.baseplugin.event.BaseListener;
 import uk.co.jacekk.bukkit.playerstats.PlayerStats;
 import uk.co.jacekk.bukkit.playerstats.QueryBuilder;
 
