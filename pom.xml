@@ -11,15 +11,19 @@
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		
-		<baseplugin.version>10.1</baseplugin.version>
-		<baseplugin.package>10_1</baseplugin.package>
+		<baseplugin.version>11.1</baseplugin.version>
+		<baseplugin.package>11_1</baseplugin.package>
 	</properties>
 	
 	<repositories>
 		<repository>
-			<name>Bukkit</name>
 			<id>bukkit-repo</id>
 			<url>http://repo.bukkit.org/content/groups/public/</url>
+		</repository>
+		
+		<repository>
+			<id>jacekk-repo</id>
+			<url>http://bukkit.jacekk.co.uk:8000/plugin/repository/everything/</url>
 		</repository>
 	</repositories>
 	
@@ -92,6 +96,22 @@
 				<configuration>
 					<source>1.6</source>
 					<target>1.6</target>
+				</configuration>
+			</plugin>
+			
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-jar-plugin</artifactId>
+				<version>2.4</version>
+				<configuration>
+					<archive>
+						<addMavenDescriptor>false</addMavenDescriptor>
+						<manifestEntries>
+							<Name>${project.name}</Name>
+							<Version>${project.version}</Version>
+							<Build-Number>${BUILD_NUMBER}</Build-Number>
+						</manifestEntries>
+					</archive>
 				</configuration>
 			</plugin>
 		</plugins>
